@@ -102,4 +102,11 @@ export class StoreService {
 
     return newProduct;
   }
+
+  async getFourProducts() {
+    const data = await this.prisma.product.findMany({
+      take: 4,
+    });
+    return data;
+  }
 }

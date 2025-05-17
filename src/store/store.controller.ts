@@ -33,4 +33,9 @@ export class StoreController {
   ) {
     return this.storeService.postProduct(data, files);
   }
+
+  @Get('product4')
+  async getFourProducts() {
+    return await this.storeService.getProducts();
+  }
 }
