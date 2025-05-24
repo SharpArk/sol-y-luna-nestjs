@@ -79,8 +79,6 @@ export class StoreService {
       });
     });
 
-    console.log('Sizes data:', sizesData);
-
     const newProduct = await this.prisma.product.create({
       data: {
         name,
