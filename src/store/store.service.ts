@@ -65,7 +65,7 @@ export class StoreService {
           images.push(`${file.path}.webp`);
         } catch (err) {
           console.error('Error processing image:', err);
-          throw new Error('Error procesando imagen'); // Esto causará el 500 y lo veremos en logs
+          throw new Error('Error procesando imagen');
         }
       }),
     );
