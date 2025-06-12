@@ -27,4 +27,26 @@ export class UsersService {
 
     return newUser;
   }
+
+  async findAdmin(): Promise<User | undefined> {
+    const admin = await this.prisma.user.findFirst({
+      where: {
+        role: 'admin',
+      },
+    });
+
+    return admin;
+  }
+
+  async createAdmin(data: User): Promise<User> {
+    const newAdmin = await this.prisma.user.create({
+      data: {
+        name: data.name,
+        password: data.password,
+        role: 'admin',
+      },
+    });
+
+    return newAdmin;
+  }
 }

@@ -4,4 +4,4 @@ dist
 uploads
 prisma/dev.db
 prisma/migrations
-generated/*
+generated/prisma/*

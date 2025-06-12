@@ -2,6 +2,7 @@ import { Body, Injectable, Res, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { Response } from 'express';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -10,18 +11,32 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async onModuleInit() {
+    const existingAdmins = await this.usersService.findAdmin();
+
+    if (!existingAdmins) {
+      const hashedPassword = await bcrypt.hash('Mamilindamuak2', 10); // usa env si quieres
+      const name = 'Sieghart205';
+      await this.usersService.createAdmin({
+        name,
+        password: hashedPassword,
+        role: 'admin',
+      });
+    }
+  }
+
   async signIn(
-    username: string,
+    name: string,
     pass: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<any> {
-    const user = await this.usersService.findOne(username);
-    if (user?.password !== pass) {
+    const user = await this.usersService.findOne(name);
+    if (bcrypt.compareSync(pass, user.password) === false) {
       throw new UnauthorizedException('Invalid credentials');
     }
     const payload = {
       sub: user.id,
-      username: user.name,
+      name: user.name,
       role: user.role,
     };
 
@@ -40,7 +55,11 @@ export class AuthService {
 
   async register(@Body() data: any) {
     const userData = data;
-    const newUser = await this.usersService.create(userData);
+    const passwordHash = await bcrypt.hash(userData.password, 10);
+    const newUser = await this.usersService.create({
+      name: userData.name,
+      password: passwordHash,
+    });
     return newUser;
   }
 }
