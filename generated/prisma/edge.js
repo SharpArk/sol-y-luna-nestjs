@@ -139,7 +139,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\code\\Sol y Luna\\sol-y-luna-backend\\generated\\prisma",
+      "value": "C:\\code\\SolyLuna\\sol-y-luna-backend\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -153,7 +153,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\code\\Sol y Luna\\sol-y-luna-backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\code\\SolyLuna\\sol-y-luna-backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

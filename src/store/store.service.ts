@@ -103,8 +103,16 @@ export class StoreService {
 
   async getFourProducts() {
     const data = await this.prisma.product.findMany({
+      include: {
+        images: true,
+        sizes: true,
+      },
+      orderBy: {
+        id: 'desc',
+      },
       take: 4,
     });
+
     return data;
   }
 }

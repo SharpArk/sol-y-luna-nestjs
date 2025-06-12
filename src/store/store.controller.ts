@@ -34,8 +34,8 @@ export class StoreController {
     return this.storeService.postProduct(data, files);
   }
 
-  @Get('product4')
+  @Get('FourProducts')
   async getFourProducts() {
-    return await this.storeService.getProducts();
+    return this.storeService.getFourProducts();
   }
 }
