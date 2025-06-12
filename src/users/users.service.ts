@@ -16,4 +16,15 @@ export class UsersService {
 
     return data;
   }
+
+  async create(data: User): Promise<User> {
+    const newUser = await this.prisma.user.create({
+      data: {
+        name: data.name,
+        password: data.password,
+      },
+    });
+
+    return newUser;
+  }
 }

@@ -1,4 +1,4 @@
-import { Injectable, Res, UnauthorizedException } from '@nestjs/common';
+import { Body, Injectable, Res, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { Response } from 'express';
@@ -36,5 +36,11 @@ export class AuthService {
     return {
       message: 'login sucefull',
     };
+  }
+
+  async register(@Body() data: any) {
+    const userData = data;
+    const newUser = await this.usersService.create(userData);
+    return newUser;
   }
 }

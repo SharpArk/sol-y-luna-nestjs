@@ -28,4 +28,9 @@ export class AuthController {
     });
     return { message: 'Logged out' };
   }
+
+  @Post('register')
+  async register(@Body() data) {
+    return this.authService.register(data);
+  }
 }
