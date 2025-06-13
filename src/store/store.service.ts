@@ -14,6 +14,7 @@ export class StoreService {
       include: {
         images: true,
         sizes: true,
+        Colors: true,
       },
       orderBy: {
         id: 'desc',
@@ -106,6 +107,7 @@ export class StoreService {
       include: {
         images: true,
         sizes: true,
+        Colors: true,
       },
       orderBy: {
         id: 'desc',
@@ -114,5 +116,55 @@ export class StoreService {
     });
 
     return data;
+  }
+
+  async getUserProducts(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        name: true,
+        role: false,
+        image: true,
+        Cart: {
+          select: {
+            id: true,
+            quantity: true,
+            product: {
+              select: {
+                id: true,
+                name: true,
+                description_short: true,
+                description_long: true,
+                images: {
+                  select: {
+                    image: true,
+                  },
+                },
+                sizes: {
+                  select: {
+                    size: true,
+                    price: true,
+                  },
+                },
+                Colors: {
+                  select: {
+                    color: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user;
   }
 }

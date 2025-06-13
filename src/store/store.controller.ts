@@ -38,4 +38,9 @@ export class StoreController {
   async getFourProducts() {
     return this.storeService.getFourProducts();
   }
+
+  @Get('UserProducts/:id')
+  async getUserProducts(@Param() params: any) {
+    return this.storeService.getUserProducts(parseInt(params.id));
+  }
 }
