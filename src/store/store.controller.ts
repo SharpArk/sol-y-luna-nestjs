@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateProductDto } from './dto/create_product.dto';
+import { AddCartDto } from './dto/add_card.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('store')
@@ -42,5 +43,11 @@ export class StoreController {
   @Get('UserProducts/:id')
   async getUserProducts(@Param() params: any) {
     return this.storeService.getUserProducts(parseInt(params.id));
+  }
+
+  @Post('addCart')
+  async addCart(@Body() body: AddCartDto) {
+    const { idUser, idProduct, quantity } = body;
+    return this.storeService.newCart(idUser, idProduct, quantity);
   }
 }

@@ -167,4 +167,24 @@ export class StoreService {
 
     return user;
   }
+
+  async newCart(idUser: number, idProduct: number, quantity: number) {
+    const validate = await this.prisma.cart.findMany({
+      where: { user_id: idUser, product_id: idProduct },
+    });
+
+    if (validate.length !== 0) {
+      return { message: 'Producto ya existente en el carrito' };
+    } else {
+      const newCart = await this.prisma.cart.create({
+        data: {
+          user_id: idUser,
+          product_id: idProduct,
+          quantity: quantity,
+        },
+      });
+
+      return { newCart, message: 'Producto añadido correctamente' };
+    }
+  }
 }
