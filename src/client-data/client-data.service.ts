@@ -7,7 +7,10 @@ export class ClientDataService {
   async newClientData(data: any) {
     const Validate = await this.prisma.clientData.findMany({
       where: {
-        Phone: String(data.Phone),
+        OR: [
+          { Phone: String(data.Phone) },
+          { Instagram: data.Instagram ? String(data.Instagram) : undefined },
+        ],
       },
     });
 
