@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,13 +12,16 @@ export class ClientDataService {
     });
 
     if (Validate.length !== 0) {
-      return { message: 'Datos de cliente ya existente' };
+      throw new HttpException(
+        'Datos de cliente ya existente',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const newClientData = await this.prisma.clientData.create({
       data: data,
     });
 
-    return newClientData;
+    return { message: 'Datos añadidos correctamente', newClientData };
   }
 }
