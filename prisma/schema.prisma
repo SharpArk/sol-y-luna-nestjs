@@ -73,3 +73,10 @@ model Cart{
   user User @relation(fields: [user_id], references: [id])
   product Product @relation(fields: [product_id], references: [id])
 }
+
+model ClientData{
+  id Int @id @default(autoincrement())
+  Name String
+  Phone String
+  Instagram String?
+}
