@@ -1,4 +1,10 @@
-import { Body, Injectable, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Injectable,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { Response } from 'express';
@@ -57,7 +63,21 @@ export class AuthService {
 
   async register(@Body() data: any) {
     const userData = data;
-    const passwordHash = await bcrypt.hash(userData.password, 10);
+
+    const validateData = await this.usersService.findOne(userData.name);
+    console.log(validateData);
+    console.log(data);
+
+    if (validateData !== null) {
+      throw new BadRequestException('Usuario ya existente');
+    }
+
+    if (userData.pass == '') {
+      throw new BadRequestException('La contraseña no puede estar vacía');
+    }
+
+    const passwordHash = await bcrypt.hash(userData.pass, 10);
+
     const newUser = await this.usersService.create({
       name: userData.name,
       password: passwordHash,
