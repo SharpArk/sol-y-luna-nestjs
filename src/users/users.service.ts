@@ -13,7 +13,6 @@ export class UsersService {
         name: username,
       },
     });
-
     return data;
   }
 

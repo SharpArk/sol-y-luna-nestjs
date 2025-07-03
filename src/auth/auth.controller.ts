@@ -16,14 +16,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async signIn(@Body() body: any, @Res({ passthrough: true }) res: Response) {
-    return this.authService.signIn(body.username, body.password, res);
+    const { name, pass } = body;
+    return this.authService.signIn(name, pass, res);
   }
 
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token', {
       httpOnly: true,
-      secure: false, // o true en prod
+      secure: false,
       sameSite: 'lax',
     });
     return { message: 'Logged out' };

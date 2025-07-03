@@ -32,7 +32,7 @@ export class AuthService {
   ): Promise<any> {
     const user = await this.usersService.findOne(name);
     if (bcrypt.compareSync(pass, user.password) === false) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Credenciales invalidas');
     }
     const payload = {
       sub: user.id,
