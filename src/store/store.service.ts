@@ -1,9 +1,16 @@
-import { Injectable, Param } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  Param,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateProductDto } from './dto/create_product.dto';
 import * as sharp from 'sharp';
 import * as path from 'path';
+import * as fs from 'fs';
 import { unlink } from 'fs/promises';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class StoreService {
@@ -59,14 +66,16 @@ export class StoreService {
             .webp({ quality: 80 })
             .toFile(newFilepath)
             .catch((err) => {
-              console.error('Error converting image:', err);
+              throw new BadRequestException(
+                'Error al convertir la imagen: ',
+                err,
+              );
             });
 
           await unlink(filepath);
           images.push(`${file.path}.webp`);
         } catch (err) {
-          console.error('Error processing image:', err);
-          throw new Error('Error procesando imagen');
+          throw new BadRequestException('Error procesando la imagen');
         }
       }),
     );
@@ -185,6 +194,48 @@ export class StoreService {
       });
 
       return { newCart, message: 'Producto añadido correctamente' };
+    }
+  }
+
+  async removeProduct(idProduct: any) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: parseInt(idProduct) },
+    });
+    if (!product) throw new NotFoundException('Producto no encontrado');
+
+    const imageProduct = await this.prisma.images.findMany({
+      where: {
+        product_id: parseInt(idProduct),
+      },
+    });
+
+    // Eliminar archivos físicos
+    for (const e of imageProduct) {
+      const absolutePath = path.join(__dirname, '..', '..', e.image);
+      try {
+        await unlink(absolutePath);
+      } catch (err) {
+        console.error('Error eliminando archivo:', err);
+      }
+    }
+
+    try {
+      // Elimina imágenes asociadas
+      await this.prisma.images.deleteMany({
+        where: { product_id: parseInt(idProduct) },
+      });
+
+      // Elimina el producto
+      const deleted = await this.prisma.product.delete({
+        where: {
+          id: parseInt(idProduct),
+        },
+      });
+
+      return deleted;
+    } catch (error) {
+      console.error('Error en removeProduct:', error);
+      throw new BadRequestException('No se pudo eliminar el producto');
     }
   }
 }

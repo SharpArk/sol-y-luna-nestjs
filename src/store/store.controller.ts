@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -49,5 +50,11 @@ export class StoreController {
   async addCart(@Body() body: AddCartDto) {
     const { idUser, idProduct, quantity } = body;
     return this.storeService.newCart(idUser, idProduct, quantity);
+  }
+
+  @Delete('Delete/:id')
+  async deleteProduct(@Param() params: any) {
+    const { id } = params;
+    return this.storeService.removeProduct(id);
   }
 }
