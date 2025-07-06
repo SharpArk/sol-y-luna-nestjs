@@ -84,8 +84,19 @@ export class StoreController {
     return this.storeService.deleteImage(id);
   }
 
+  @Delete('/Category/:id')
+  async deleteCategory(@Param() params: any) {
+    const { id } = params;
+    return this.storeService.deleteCategory(id);
+  }
+
   @Put('/UpdateProduct')
   async updateProduct(@Body() data: any) {
     return this.storeService.updateProduct(data);
+  }
+
+  @Put('/UpdateCategory')
+  async updateCategory(@Body() data: any) {
+    this.storeService.updateCategory(data);
   }
 }

@@ -375,4 +375,52 @@ export class StoreService {
       );
     }
   }
+
+  async deleteCategory(id: any) {
+    const validateCategory = await this.prisma.category.findMany({
+      where: { id: parseInt(id) },
+    });
+
+    if (!validateCategory) {
+      throw new BadRequestException('Categoria no existente');
+    }
+
+    try {
+      const removeCategory = await this.prisma.category.deleteMany({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      return removeCategory;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
+
+  async updateCategory(data: any) {
+    const { id, newName } = data;
+    const validateCategory = await this.prisma.category.findMany({
+      where: {
+        id,
+      },
+    });
+
+    if (!validateCategory) {
+      throw new BadRequestException('Categoría no existente');
+    }
+
+    try {
+      const updatedCategory = await this.prisma.category.updateMany({
+        where: {
+          id,
+        },
+        data: {
+          name: newName,
+        },
+      });
+      return updatedCategory;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
+  }
 }

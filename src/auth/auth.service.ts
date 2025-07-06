@@ -37,9 +37,16 @@ export class AuthService {
     @Res({ passthrough: true }) res: Response,
   ): Promise<any> {
     const user = await this.usersService.findOne(name);
-    if (bcrypt.compareSync(pass, user.password) === false) {
-      throw new UnauthorizedException('Credenciales invalidas');
+
+    if (!user) {
+      throw new UnauthorizedException('Usuario no encontrado');
     }
+
+    const isMatch = bcrypt.compareSync(pass, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
     const payload = {
       sub: user.id,
       name: user.name,
@@ -57,7 +64,7 @@ export class AuthService {
     });
 
     return {
-      message: 'login sucefull',
+      message: 'login successful',
     };
   }
 
