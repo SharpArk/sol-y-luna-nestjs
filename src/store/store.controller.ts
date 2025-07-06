@@ -44,7 +44,7 @@ export class StoreController {
 
   @Post('/CreateCategory')
   async addCategory(@Body() data: any) {
-    return this.storeService.createCategory;
+    return this.storeService.createCategory(data);
   }
 
   @Get('/Categoryes')
