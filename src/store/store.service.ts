@@ -10,7 +10,6 @@ import * as sharp from 'sharp';
 import * as path from 'path';
 import * as fs from 'fs';
 import { unlink } from 'fs/promises';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class StoreService {
@@ -21,7 +20,6 @@ export class StoreService {
       include: {
         images: true,
         sizes: true,
-        Colors: true,
       },
       orderBy: {
         id: 'desc',
@@ -116,7 +114,6 @@ export class StoreService {
       include: {
         images: true,
         sizes: true,
-        Colors: true,
       },
       orderBy: {
         id: 'desc',
@@ -156,11 +153,6 @@ export class StoreService {
                   select: {
                     size: true,
                     price: true,
-                  },
-                },
-                Colors: {
-                  select: {
-                    color: true,
                   },
                 },
               },
@@ -236,6 +228,151 @@ export class StoreService {
     } catch (error) {
       console.error('Error en removeProduct:', error);
       throw new BadRequestException('No se pudo eliminar el producto');
+    }
+  }
+
+  async deleteImage(idImage: any) {
+    const validateImage = await this.prisma.images.findUnique({
+      where: {
+        id: parseInt(idImage),
+      },
+    });
+
+    if (!validateImage) {
+      throw new BadRequestException('Imagen no existente');
+    }
+
+    const absolutePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      validateImage.image, // ya que es `.findUnique()`, no necesitas [0]
+    );
+
+    try {
+      await unlink(absolutePath);
+    } catch (err) {
+      console.error('Error al borrar el archivo:', err);
+      throw new BadRequestException('No se pudo borrar el archivo del sistema');
+    }
+
+    try {
+      const removeImage = await this.prisma.images.delete({
+        where: {
+          id: parseInt(idImage),
+        },
+      });
+      return removeImage;
+    } catch (error) {
+      throw new BadRequestException(
+        `Error al eliminar imagen de la base de datos: ${error.message || error}`,
+      );
+    }
+  }
+
+  async postImage(data: any, files: Express.Multer.File[]) {
+    const { product_id } = data;
+    const images: string[] = [];
+
+    await Promise.all(
+      files.map(async (file) => {
+        try {
+          const filepath = path.join(__dirname, '..', '..', file.path);
+          const newFilepath = path.join(
+            __dirname,
+            '..',
+            '..',
+            `${file.path}.webp`,
+          );
+
+          await sharp(filepath)
+            .webp({ quality: 80 })
+            .toFile(newFilepath)
+            .catch((err) => {
+              throw new BadRequestException(
+                'Error al convertir la imagen: ',
+                err,
+              );
+            });
+
+          await unlink(filepath);
+          images.push(`${file.path}.webp`);
+        } catch (err) {
+          throw new BadRequestException('Error procesando la imagen');
+        }
+      }),
+    );
+
+    const createdImages = await Promise.all(
+      images.map(async (image) => {
+        return this.prisma.images.create({
+          data: {
+            image: image,
+            product_id: Number(product_id),
+          },
+        });
+      }),
+    );
+
+    return createdImages;
+  }
+
+  async updateProduct(data: {
+    id: number;
+    name: string;
+    description_short: string;
+    description_long: string;
+    sizes: { size: string; price: number }[];
+    category: { id: number; name: string } | null;
+  }) {
+    const { id, name, description_short, description_long, sizes, category } =
+      data;
+    const updatedProduct = await this.prisma.product.update({
+      where: { id },
+      data: {
+        name,
+        description_short,
+        description_long,
+        category: category
+          ? {
+              connect: { id: category.id },
+            }
+          : undefined,
+        sizes: {
+          deleteMany: { product_id: id },
+          create: sizes.map((s) => ({
+            size: s.size,
+            price: s.price,
+          })),
+        },
+      },
+      include: { sizes: true, category: true },
+    });
+
+    return updatedProduct;
+  }
+
+  async createCategory(data: any) {
+    try {
+      const newCategory = await this.prisma.category.create({
+        data: {
+          name: data.nombre,
+        },
+      });
+      return newCategory;
+    } catch (error) {
+      throw new BadRequestException('Error al crear nueva categoria: ' + error);
+    }
+  }
+
+  async getCategory() {
+    try {
+      const category = await this.prisma.category.findMany();
+      return category;
+    } catch (error) {
+      throw new BadRequestException(
+        'Error al obtener las categorias: ' + error,
+      );
     }
   }
 }

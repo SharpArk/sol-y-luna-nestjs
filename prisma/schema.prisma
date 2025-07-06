@@ -22,17 +22,10 @@
     images Images[]
     sizes Sizes[]
     Cart Cart[]
-    Colors Colors[]
     category_id Int?
     category Category? @relation(fields: [category_id], references: [id], onDelete: Cascade)
   }
 
-  model Colors{
-    id Int @id @default(autoincrement())
-    color String
-    product_id Int
-    product Product @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  }
 
   model Category {
     id Int @id @default(autoincrement())

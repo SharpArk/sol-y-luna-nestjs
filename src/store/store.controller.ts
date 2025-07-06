@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -17,23 +18,38 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 export class StoreController {
   constructor(private readonly storeService: StoreService) {}
 
-  @Get('products')
-  async getProducts() {
-    return this.storeService.getProducts();
-  }
-
-  @Get('products/:id')
-  async getOneProduct(@Param() params: any) {
-    return this.storeService.getOneProduct(parseInt(params.id));
-  }
-
   @Post('product')
-  @UseInterceptors(FilesInterceptor('images')) // Cambiar aquí a FilesInterceptor
+  @UseInterceptors(FilesInterceptor('images'))
   async postProduct(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() data: CreateProductDto,
   ) {
     return this.storeService.postProduct(data, files);
+  }
+
+  @Post('addImage')
+  @UseInterceptors(FilesInterceptor('images'))
+  async postImage(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Body() data: any,
+  ) {
+    return this.storeService.postImage(data, files);
+  }
+
+  @Post('addCart')
+  async addCart(@Body() body: AddCartDto) {
+    const { idUser, idProduct, quantity } = body;
+    return this.storeService.newCart(idUser, idProduct, quantity);
+  }
+
+  @Post('/CreateCategory')
+  async addCategory(@Body() data: any) {
+    return this.storeService.createCategory;
+  }
+
+  @Get('/Categoryes')
+  async getCategory() {
+    return this.storeService.getCategory();
   }
 
   @Get('FourProducts')
@@ -46,15 +62,30 @@ export class StoreController {
     return this.storeService.getUserProducts(parseInt(params.id));
   }
 
-  @Post('addCart')
-  async addCart(@Body() body: AddCartDto) {
-    const { idUser, idProduct, quantity } = body;
-    return this.storeService.newCart(idUser, idProduct, quantity);
+  @Get('products')
+  async getProducts() {
+    return this.storeService.getProducts();
+  }
+
+  @Get('products/:id')
+  async getOneProduct(@Param() params: any) {
+    return this.storeService.getOneProduct(parseInt(params.id));
   }
 
   @Delete('Delete/:id')
   async deleteProduct(@Param() params: any) {
     const { id } = params;
     return this.storeService.removeProduct(id);
+  }
+
+  @Delete('/DeleteImage/:id')
+  async deleteImage(@Param() params: any) {
+    const { id } = params;
+    return this.storeService.deleteImage(id);
+  }
+
+  @Put('/UpdateProduct')
+  async updateProduct(@Body() data: any) {
+    return this.storeService.updateProduct(data);
   }
 }
