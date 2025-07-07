@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -33,5 +34,10 @@ export class AuthController {
   @Post('register')
   async register(@Body() data) {
     return this.authService.register(data);
+  }
+
+  @Put('UpdateUser')
+  async updateUser(@Body() data) {
+    return this.authService.updateUserData(data);
   }
 }

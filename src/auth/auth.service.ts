@@ -9,12 +9,15 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { Response } from 'express';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { hash } from 'crypto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private prisma: PrismaService,
   ) {}
 
   async onModuleInit() {
@@ -72,8 +75,6 @@ export class AuthService {
     const userData = data;
 
     const validateData = await this.usersService.findOne(userData.name);
-    console.log(validateData);
-    console.log(data);
 
     if (validateData !== null) {
       throw new BadRequestException('Usuario ya existente');
@@ -90,5 +91,38 @@ export class AuthService {
       password: passwordHash,
     });
     return newUser;
+  }
+
+  async updateUserData(data: any) {
+    const { name, password, id } = data;
+
+    const existingUser = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingUser) {
+      throw new BadRequestException('No se encontró el usuario');
+    }
+
+    const userWithSameName = await this.prisma.user.findFirst({
+      where: { name },
+    });
+
+    if (userWithSameName && userWithSameName.id !== id) {
+      throw new BadRequestException('Nombre de usuario ya está en uso');
+    }
+
+    try {
+      const newPassword = await bcrypt.hash(password, 10);
+      const updatedUser = await this.prisma.user.update({
+        where: { id },
+        data: { name, password: newPassword },
+      });
+      return updatedUser;
+    } catch (error) {
+      throw new BadRequestException(
+        error.message || 'Error al actualizar usuario',
+      );
+    }
   }
 }
