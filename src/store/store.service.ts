@@ -170,7 +170,6 @@ export class StoreService {
   }
 
   async newCart(idUser: number, idProduct: number, quantity: number) {
-    console.log({ idUser, idProduct, quantity });
     const validate = await this.prisma.cart.findMany({
       where: { user_id: idUser, product_id: idProduct },
     });
