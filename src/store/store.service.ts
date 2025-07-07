@@ -170,12 +170,13 @@ export class StoreService {
   }
 
   async newCart(idUser: number, idProduct: number, quantity: number) {
+    console.log({ idUser, idProduct, quantity });
     const validate = await this.prisma.cart.findMany({
       where: { user_id: idUser, product_id: idProduct },
     });
 
     if (validate.length !== 0) {
-      return { message: 'Producto ya existente en el carrito' };
+      throw new BadRequestException('Producto ya existente en el carrito');
     } else {
       const newCart = await this.prisma.cart.create({
         data: {
@@ -185,7 +186,7 @@ export class StoreService {
         },
       });
 
-      return { newCart, message: 'Producto añadido correctamente' };
+      return newCart;
     }
   }
 
