@@ -25,8 +25,10 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token', {
       httpOnly: true,
-      secure: false,
+      secure: process.env.SECURE === 'true',
       sameSite: 'lax',
+      domain: process.env.DOMAIN,
+      maxAge: 0,
     });
     return { message: 'Logged out' };
   }
