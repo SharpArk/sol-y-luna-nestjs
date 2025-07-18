@@ -11,7 +11,7 @@ import { join } from 'path';
       dest: './uploads',
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', './uploads'),
+      rootPath: join(process.cwd(),'/uploads'),
       serveRoot: '/uploads',
     }),
   ],

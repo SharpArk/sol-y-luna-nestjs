@@ -64,6 +64,7 @@ export class AuthService {
       secure: false,
       sameSite: 'lax',
       maxAge: 1000 * 60 * 60,
+      domain: process.env.DOMAIN,
     });
 
     return {

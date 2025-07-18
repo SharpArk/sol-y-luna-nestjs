@@ -73,7 +73,7 @@ export class StoreService {
           await unlink(filepath);
           images.push(`${file.path}.webp`);
         } catch (err) {
-          throw new BadRequestException('Error procesando la imagen');
+          throw new BadRequestException(`Error procesando la imagen: ${err.message}`);
         }
       }),
     );
